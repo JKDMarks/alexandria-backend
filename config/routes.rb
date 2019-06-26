@@ -10,4 +10,7 @@ Rails.application.routes.draw do
   post '/decks', to: 'decks#create'
 
   get '/cards', to: 'cards#index'
+
+  post '/favorites', to: 'favorites#create'
+  delete '/favorites/:user_id/:deck_id', to: 'favorites#destroy'
 end
