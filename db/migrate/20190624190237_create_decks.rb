@@ -4,6 +4,7 @@ class CreateDecks < ActiveRecord::Migration[5.2]
       t.integer :user_id
       t.string :name
       t.string :format
+      t.string :image
 
       t.timestamps
     end

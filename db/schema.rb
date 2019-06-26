@@ -33,12 +33,14 @@ ActiveRecord::Schema.define(version: 2019_06_24_190901) do
   create_table "deck_cards", force: :cascade do |t|
     t.integer "card_id"
     t.integer "deck_id"
+    t.integer "quantity"
   end
 
   create_table "decks", force: :cascade do |t|
     t.integer "user_id"
     t.string "name"
     t.string "format"
+    t.string "image"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
