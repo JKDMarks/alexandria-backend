@@ -1,4 +1,9 @@
 class UsersController < ApplicationController
+  def index
+    @users = User.all
+    render json: @users
+  end
+
   def create
     if params[:password] === params[:passwordConfirm]
       @user = User.create(user_params)
@@ -15,6 +20,7 @@ class UsersController < ApplicationController
 
   def profile
     token = request.headers[:Authorization]
+    puts "TOKEN", token
     decoded_token = JWT.decode token, "power10", true, { algorithm: 'HS256' }
     user_id = decoded_token[0]["user_id"]
     @user = User.find(user_id)
