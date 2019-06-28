@@ -1,7 +1,12 @@
 class DecksController < ApplicationController
   def index
     @decks = Deck.all
-    render json: @decks
+    render json: @decks, include: [:deck_cards, :user]
+  end
+
+  def show
+    @deck = Deck.find(params[:id])
+    render json: @deck, include: [:user, :cards, :deck_cards]
   end
 
   def create
@@ -10,10 +15,10 @@ class DecksController < ApplicationController
     if @deck.valid?
       @deck.save
 
-      params.permit(:cards).each do |card|
+      params[:cards].each do |card|
         DeckCard.create(
           deck_id: @deck.id,
-          user_id: params.permit(:user_id),
+          card_id: card["id"],
           quantity: card["quantity"]
         )
       end

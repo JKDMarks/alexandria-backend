@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get '/profile', to: 'users#profile'
 
   get '/decks', to: 'decks#index'
+  get '/decks/:id', to: 'decks#show'
   post '/decks', to: 'decks#create'
 
   get '/cards', to: 'cards#index'

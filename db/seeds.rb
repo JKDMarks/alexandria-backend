@@ -70,7 +70,7 @@ archetypes.each do |archetype|
     format: archetype[1],
     image: Card.all.sample.image_uris["art_crop"]
   )
-  
+
   5.times do
     DeckCard.create(deck: deck, card: Card.all.sample, quantity: rand(1..4))
   end
