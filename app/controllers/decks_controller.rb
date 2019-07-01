@@ -23,9 +23,7 @@ class DecksController < ApplicationController
         )
       end
 
-
-
-      @deck.update(image: random_card_img)
+      @deck.update(image: random_card_img(@deck))
 
       render json: @deck
     else
@@ -34,16 +32,24 @@ class DecksController < ApplicationController
   end
 
 
+  def delete
+    Deck.find(params[:id]).destroy
+    @decks = Deck.all
+    render json: @decks, include: []
+  end
+
   private
 
   def random_card_img(deck)
-    if deck.cards.where(quantity: 4)
-      random_card = deck.cards.where(quantity: 4)
+    if deck.deck_cards.where(quantity: 4).any?
+      deck_cards = deck.deck_cards.where(quantity: 4)
     else
-      random_card = deck.cards
+      deck_cards = deck.deck_cards
     end
 
-    if random_card.image_uris
+    random_card = deck_cards.sample.card
+
+    if random_card.image_uris.any?
       random_card.image_uris["art_crop"]
     else
       "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=74250&type=card"

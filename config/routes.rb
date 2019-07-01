@@ -9,8 +9,10 @@ Rails.application.routes.draw do
   get '/decks', to: 'decks#index'
   get '/decks/:id', to: 'decks#show'
   post '/decks', to: 'decks#create'
+  delete '/decks/:id', to: 'decks#delete'
 
   get '/cards', to: 'cards#index'
+  get '/cards/:format', to: 'cards#by_format'
 
   post '/favorites', to: 'favorites#create'
   delete '/favorites/:user_id/:deck_id', to: 'favorites#destroy'
