@@ -23,6 +23,10 @@ class DecksController < ApplicationController
         )
       end
 
+
+
+      @deck.update(image: random_card_img)
+
       render json: @deck
     else
       render json: { error: "Something went wrong" }
@@ -32,7 +36,21 @@ class DecksController < ApplicationController
 
   private
 
+  def random_card_img(deck)
+    if deck.cards.where(quantity: 4)
+      random_card = deck.cards.where(quantity: 4)
+    else
+      random_card = deck.cards
+    end
+
+    if random_card.image_uris
+      random_card.image_uris["art_crop"]
+    else
+      "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=74250&type=card"
+    end
+  end
+
   def deck_params
-    params.permit(:user_id, :name, :format, :image)
+    params.permit(:user_id, :name, :format)
   end
 end

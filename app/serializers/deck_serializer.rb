@@ -4,6 +4,7 @@ class DeckSerializer < ActiveModel::Serializer
   has_many :deck_cards
   has_many :cards
   belongs_to :user
+
   class UserSerializer < ActiveModel::Serializer
     attributes :username, :image
   end

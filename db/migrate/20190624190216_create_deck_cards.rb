@@ -4,6 +4,7 @@ class CreateDeckCards < ActiveRecord::Migration[5.2]
       t.integer :card_id
       t.integer :deck_id
       t.integer :quantity
+      t.boolean :sideboard, default: false
     end
   end
 end

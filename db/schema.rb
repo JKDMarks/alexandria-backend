@@ -34,6 +34,7 @@ ActiveRecord::Schema.define(version: 2019_06_24_190901) do
     t.integer "card_id"
     t.integer "deck_id"
     t.integer "quantity"
+    t.boolean "sideboard", default: false
   end
 
   create_table "decks", force: :cascade do |t|

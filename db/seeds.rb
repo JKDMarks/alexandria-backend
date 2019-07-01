@@ -10,7 +10,7 @@ def create_cards_from_url(url)
       type_line = card["type_line"].split(" — ")
 
       Card.create({
-        id: card["id"],
+        scryfall_id: card["id"],
         name: card["name"],
         image_uris: card["image_uris"],
         mana_cost: card["mana_cost"],
@@ -21,11 +21,11 @@ def create_cards_from_url(url)
         legalities: card["legalities"],
         prices: card["prices"],
         types: type_line[0].split,
-        subtypes: type_line[1].split
+        subtypes: type_line[1] ? type_line[1].split : []
       })
-    end
 
-    puts card["name"]
+      puts card["name"]
+    end
   end
 
   if cards["has_more"]
@@ -35,16 +35,17 @@ end
 
 url = "https://api.scryfall.com/cards/search?q=t:%22legendary%20creature%22"
 
-# create_cards_from_url(url)
+all_cards_url = "https://api.scryfall.com/cards/search?q=*"
+# create_cards_from_url(all_cards_url)
 
-(1..3).to_a.each do |n|
-  User.create(
-    username: "jeff#{n}",
-    password: "jeff",
-    favorite_card_id: Card.all.sample.id,
-    image: Card.all.sample.image_uris["art_crop"]
-  )
-end
+# (1..3).to_a.each do |n|
+#   User.create(
+#     username: "jeff#{n}",
+#     password: "jeff",
+#     favorite_card_id: Card.all.sample.id,
+#     image: Card.all.sample.image_uris["art_crop"]
+#   )
+# end
 
 archetypes = [
   ["Mono Red", "standard"],
