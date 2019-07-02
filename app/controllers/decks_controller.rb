@@ -23,7 +23,15 @@ class DecksController < ApplicationController
         )
       end
 
-      @deck.update(image: random_card_img(@deck))
+      card = Card.find(params[:image])
+
+      if card &&card.image_uris.any?
+        card_image = card.image_uris["art_crop"]
+      else
+        card_image = Card.find_by_name("Black Lotus").image_uris["art_crop"]
+      end
+
+      @deck.update(image: card_image)
 
       render json: @deck
     else
@@ -31,6 +39,24 @@ class DecksController < ApplicationController
     end
   end
 
+  def update
+    @deck = Deck.find(params[:id])
+    @deck.update(params.permit(:name))
+    card_image = Card.find(params[:image]).image_uris["art_crop"]
+    @deck.update(image: card_image)
+
+    @deck.deck_cards.destroy_all
+
+    params[:cards].each do |card|
+      DeckCard.create(
+        deck_id: @deck.id,
+        card_id: card["id"],
+        quantity: card["quantity"]
+      )
+    end
+
+    render json: @deck
+  end
 
   def delete
     Deck.find(params[:id]).destroy
@@ -40,21 +66,21 @@ class DecksController < ApplicationController
 
   private
 
-  def random_card_img(deck)
-    if deck.deck_cards.where(quantity: 4).any?
-      deck_cards = deck.deck_cards.where(quantity: 4)
-    else
-      deck_cards = deck.deck_cards
-    end
-
-    random_card = deck_cards.sample.card
-
-    if random_card.image_uris.any?
-      random_card.image_uris["art_crop"]
-    else
-      "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=74250&type=card"
-    end
-  end
+  # def random_card_img(deck)
+  #   if deck.deck_cards.where(quantity: 4).any?
+  #     deck_cards = deck.deck_cards.where(quantity: 4)
+  #   else
+  #     deck_cards = deck.deck_cards
+  #   end
+  #
+  #   random_card = deck_cards.sample.card
+  #
+  #   if random_card.image_uris.any?
+  #     random_card.image_uris["art_crop"]
+  #   else
+  #     "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=74250&type=card"
+  #   end
+  # end
 
   def deck_params
     params.permit(:user_id, :name, :format)

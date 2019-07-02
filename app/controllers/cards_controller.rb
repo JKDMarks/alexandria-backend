@@ -8,8 +8,10 @@ class CardsController < ApplicationController
   def by_format
     @cards = Card.first(50)
 
-    byebug
+    cards_by_format = @cards.select do |card|
+      card.legalities[params[:format]] === "legal"
+    end
 
-    render json: @cards
+    render json: cards_by_format
   end
 end
