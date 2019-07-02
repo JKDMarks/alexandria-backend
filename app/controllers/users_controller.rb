@@ -4,6 +4,18 @@ class UsersController < ApplicationController
     render json: @users
   end
 
+  def show
+    user = User.find(params[:id])
+    favorite_card = user.favorite_card_id ? Card.find(user.favorite_card_id) : nil
+    render json: {
+      id: user.id,
+      username: user.username,
+      favorite_card: favorite_card,
+      image: user.image,
+      decks: user.decks
+    }
+  end
+
   def create
     if params[:password] === params[:passwordConfirm]
       @user = User.create(user_params)
