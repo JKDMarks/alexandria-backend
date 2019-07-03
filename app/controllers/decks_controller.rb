@@ -1,6 +1,6 @@
 class DecksController < ApplicationController
   def index
-    @decks = Deck.all
+    @decks = Deck.order(:updated_at)
     render json: @decks, include: [:deck_cards, :user]
   end
 
@@ -39,6 +39,65 @@ class DecksController < ApplicationController
     end
   end
 
+  def create_from_decklist
+    @deck = Deck.new(deck_params)
+
+    if @deck.valid?
+      @deck.save
+      decklist = params[:decklist].split("\n")
+      split_index = decklist.index("")
+      mainboard = decklist[0..(split_index - 1)]
+      sideboard = decklist[(split_index + 1)..-1]
+
+      mainboard.each do |card|
+        card = card.split(" ", 2)
+        quantity = card[0].to_i
+        card_name = card[1]
+
+        if card_name.scan(/ \/ /).count == 1
+          card_name = card_name.sub(" / ", " // ")
+        elsif card_name.count("/") == 1
+          card_name = card_name.sub("/", " // ")
+        end
+
+        card_instance = Card.find_by("name ~* ?", card_name)
+
+        if quantity != 0 && card_instance
+          DeckCard.create(
+            card: card_instance,
+            deck: @deck,
+            quantity: quantity
+          )
+        end
+      end
+
+      sideboard.each do |card|
+        card = card.split(" ", 2)
+        quantity = card[0].to_i
+        card_name = card[1]
+
+        if card_name.scan(/ \/ /).count == 1
+          card_name = card_name.sub(" / ", " // ")
+        elsif card_name.count("/") == 1
+          card_name = card_name.sub("/", " // ")
+        end
+
+        card_instance = Card.find_by("name ~* ?", card_name)
+
+        if quantity != 0 && card_instance
+          dc = DeckCard.create(
+            card: card_instance,
+            deck: @deck,
+            quantity: quantity,
+            sideboard: true
+          )
+        end
+      end
+
+      render json: @deck
+    end
+  end
+
   def update
     @deck = Deck.find(params[:id])
     @deck.update(params.permit(:name))
@@ -51,7 +110,8 @@ class DecksController < ApplicationController
       DeckCard.create(
         deck_id: @deck.id,
         card_id: card["id"],
-        quantity: card["quantity"]
+        quantity: card["quantity"],
+        sideboard: card["sideboard"]
       )
     end
 
@@ -64,23 +124,8 @@ class DecksController < ApplicationController
     render json: @decks, include: []
   end
 
-  private
 
-  # def random_card_img(deck)
-  #   if deck.deck_cards.where(quantity: 4).any?
-  #     deck_cards = deck.deck_cards.where(quantity: 4)
-  #   else
-  #     deck_cards = deck.deck_cards
-  #   end
-  #
-  #   random_card = deck_cards.sample.card
-  #
-  #   if random_card.image_uris.any?
-  #     random_card.image_uris["art_crop"]
-  #   else
-  #     "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=74250&type=card"
-  #   end
-  # end
+  private
 
   def deck_params
     params.permit(:user_id, :name, :format)

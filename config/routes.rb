@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get '/decks', to: 'decks#index'
   get '/decks/:id', to: 'decks#show'
   post '/decks', to: 'decks#create'
+  post '/decklist', to: 'decks#create_from_decklist'
   patch '/decks/:id', to: 'decks#update'
   delete '/decks/:id', to: 'decks#delete'
 
