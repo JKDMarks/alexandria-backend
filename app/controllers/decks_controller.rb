@@ -4,6 +4,16 @@ class DecksController < ApplicationController
     render json: @decks, include: [:deck_cards, :user]
   end
 
+  def by_format
+    @decks = Deck.all
+
+    decks_by_format = @decks.select do |deck|
+      deck.format === params[:format]
+    end
+
+    render json: decks_by_format
+  end
+
   def show
     @deck = Deck.find(params[:id])
     render json: @deck, include: [:user, :cards, :deck_cards]

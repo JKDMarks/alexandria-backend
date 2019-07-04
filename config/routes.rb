@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get '/profile', to: 'users#profile'
 
   get '/decks', to: 'decks#index'
+  get '/decks/format/:format', to: 'decks#by_format'
   get '/decks/:id', to: 'decks#show'
   post '/decks', to: 'decks#create'
   post '/decklist', to: 'decks#create_from_decklist'
