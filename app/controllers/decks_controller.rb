@@ -24,36 +24,7 @@ class DecksController < ApplicationController
 
     if @deck.valid?
       @deck.save
-
-      params[:cards].each do |card|
-        DeckCard.create(
-          deck_id: @deck.id,
-          card_id: card["id"],
-          quantity: card["quantity"]
-        )
-      end
-
-      card = Card.find(params[:image])
-
-      if card &&card.image_uris.any?
-        card_image = card.image_uris["art_crop"]
-      else
-        card_image = Card.find_by_name("Black Lotus").image_uris["art_crop"]
-      end
-
-      @deck.update(image: card_image)
-
-      render json: @deck
-    else
-      render json: { error: "Something went wrong" }
-    end
-  end
-
-  def create_from_decklist
-    @deck = Deck.new(deck_params)
-
-    if @deck.valid?
-      @deck.save
+      deck_colors = []
       decklist = params[:decklist].split("\n")
       split_index = decklist.index("")
       mainboard = decklist[0..(split_index - 1)]
@@ -73,12 +44,15 @@ class DecksController < ApplicationController
         card_instance = Card.find_by("name ~* ?", "^" + card_name)
 
         if quantity != 0 && card_instance
-          # puts "========================================\nMAIN BOARD\n#{card_instance.name}\n========================================"
           DeckCard.create(
             card: card_instance,
             deck: @deck,
             quantity: quantity
           )
+
+          if card_instance.mana_cost.exclude?("P") && card_instance.mana_cost.exclude?("/")
+            deck_colors = deck_colors + card_instance.colors
+          end
         end
       end
 
@@ -96,13 +70,28 @@ class DecksController < ApplicationController
         card_instance = Card.find_by("name ~* ?", "^" + card_name)
 
         if quantity != 0 && card_instance
-          # puts "========================================\nSIDE BOARD\n#{card_instance.name}\n========================================"
           dc = DeckCard.create(
             card: card_instance,
             deck: @deck,
             quantity: quantity,
             sideboard: true
           )
+
+          if card_instance.mana_cost.exclude?("P") && card_instance.mana_cost.exclude?("/")
+            deck_colors = deck_colors + card_instance.colors
+          end
+        end
+      end
+
+      deck_colors = deck_colors.uniq
+      @deck.update(colors: deck_colors)
+
+      deck_image_card = Card.find_by("name ~* ?", params[:image])
+
+      if deck_image_card
+        deck_image = deck_image_card.image_uris["art_crop"]
+        if deck_image
+          @deck.update(image: deck_image)
         end
       end
 
@@ -143,3 +132,16 @@ class DecksController < ApplicationController
     params.permit(:user_id, :name, :format)
   end
 end
+
+# UPDATE DECK COLORS
+# Deck.all.each do |deck|
+#   deck.cards.each do |card|
+#     if card.mana_cost && card.mana_cost.exclude?("P") && card.mana_cost.exclude?("/")
+#       card.colors.each do |color|
+#         if !deck.colors.include?(color)
+#           deck.update(colors: deck.colors + [color])
+#         end
+#       end
+#     end
+#   end
+# end
