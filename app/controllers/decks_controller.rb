@@ -70,9 +70,10 @@ class DecksController < ApplicationController
           card_name = card_name.sub("/", " // ")
         end
 
-        card_instance = Card.find_by("name ~* ?", card_name)
+        card_instance = Card.find_by("name ~* ?", "^" + card_name)
 
         if quantity != 0 && card_instance
+          # puts "========================================\nMAIN BOARD\n#{card_instance.name}\n========================================"
           DeckCard.create(
             card: card_instance,
             deck: @deck,
@@ -92,9 +93,10 @@ class DecksController < ApplicationController
           card_name = card_name.sub("/", " // ")
         end
 
-        card_instance = Card.find_by("name ~* ?", card_name)
+        card_instance = Card.find_by("name ~* ?", "^" + card_name)
 
         if quantity != 0 && card_instance
+          # puts "========================================\nSIDE BOARD\n#{card_instance.name}\n========================================"
           dc = DeckCard.create(
             card: card_instance,
             deck: @deck,
