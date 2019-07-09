@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
   get '/cards', to: 'cards#index'
   get '/cards/:format', to: 'cards#by_format'
+  # post '/update_image', to: 'cards#update_image'
 
   post '/favorites', to: 'favorites#create'
   delete '/favorites/:user_id/:deck_id', to: 'favorites#destroy'
