@@ -57,11 +57,10 @@ class DecksController < ApplicationController
       deck_page = Nokogiri::HTML(open(deck_url))
 
       if deck_url.include?("www.mtggoldfish.com")
+        ############### MTGGOLDFISH ###############
         name = deck_page.css("h2.deck-view-title")[0].children[0].text.strip
         format_string = deck_page.css("div.deck-view-description")[0].text.split("\n").find{|str| str.start_with?("Format:")}
         format = format_string[format_string.index(" ") + 1..-1].downcase
-        # image_style = deck_page.css("div.card-image-tile")[0].attributes["style"].content
-        # image = image_style[image_style.index("\(\'")+2..image_style.index("\'\)\;")-1]
         deck_table_rows = deck_page.css("table.deck-view-deck-table")[0].css("tr")
         cards_array = deck_table_rows.map do |row|
           row.css("td").map{ |td| td.text.strip }[0..1]
@@ -71,6 +70,7 @@ class DecksController < ApplicationController
         mainboard = deck_array[0..(split_index - 1)]
         sideboard = deck_array[(split_index + 1)..-2]
       elsif deck_url.include?("www.starcitygames.com")
+        ############### STARCITYGAMES ###############
         name = deck_page.css("header.deck_title").text
         format = deck_page.css("div.deck_format").text.downcase
         card_uls = deck_page.css("div.cards_col1, div.cards_col2").css("ul")
@@ -91,15 +91,8 @@ class DecksController < ApplicationController
       deck_colors = return_hash[:deck_colors]
 
       deck_colors = deck_colors.uniq
-      nonland_quantity_4_cards = @deck.deck_cards.where(quantity: 4, sideboard: false).map{ |deck_card| deck_card.card }.select{ |card| card.types.exclude?("Land") }
-      random_card = nonland_quantity_4_cards.sample
 
-      if random_card.image_uris.any?
-        art_crop = random_card.image_uris["art_crop"]
-        if art_crop
-          @deck.update(image: art_crop)
-        end
-      end
+      update_deck_random_img(@deck)
 
       @deck.update(colors: deck_colors)
 
@@ -149,7 +142,6 @@ class DecksController < ApplicationController
 
   def create_dcs_update_colors(cards_arr, deck, deck_colors, is_sideboard = false)
     cards_arr.each_with_index do |card, i|
-      # puts "==============================" + card + "=============================="
       card = card.split(" ", 2)
       quantity = card[0].to_i
       card_name = card[1]
@@ -167,8 +159,6 @@ class DecksController < ApplicationController
       else
         card_instance = nil
       end
-
-
 
       if quantity != 0 && card_instance
         DeckCard.create(
@@ -188,17 +178,17 @@ class DecksController < ApplicationController
 
     return { deck_colors: deck_colors }
   end
-end
 
-# UPDATE DECK COLORS
-# Deck.all.each do |deck|
-#   deck.cards.each do |card|
-#     if card.mana_cost && card.mana_cost.exclude?("P") && card.mana_cost.exclude?("/")
-#       card.colors.each do |color|
-#         if !deck.colors.include?(color)
-#           deck.update(colors: deck.colors + [color])
-#         end
-#       end
-#     end
-#   end
-# end
+  def update_deck_random_img(deck)
+    nonland_quantity_4_cards = deck.deck_cards.where(quantity: 4, sideboard: false).map{ |deck_card| deck_card.card }.select{ |card| card.types.exclude?("Land") }
+    random_card = nonland_quantity_4_cards.sample
+
+    if random_card.image_uris.any?
+      art_crop = random_card.image_uris["art_crop"]
+      if art_crop
+        deck.update(image: art_crop)
+      end
+    end
+
+  end
+end

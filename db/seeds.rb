@@ -77,6 +77,7 @@ archetypes = [
 #   end
 # end
 
+############### ADD DECKLISTS TO DECKS ###############
 # Deck.all.each do |deck|
 #   decklist = ["", "Sideboard"]
 #
@@ -92,4 +93,18 @@ archetypes = [
 #   decklist = decklist.join("\n")
 #
 #   deck.update(decklist: decklist)
+# end
+
+
+############### UPDATE DECK COLORS ###############
+# Deck.all.each do |deck|
+#   deck.cards.each do |card|
+#     if card.mana_cost && card.mana_cost.exclude?("P") && card.mana_cost.exclude?("/")
+#       card.colors.each do |color|
+#         if !deck.colors.include?(color)
+#           deck.update(colors: deck.colors + [color])
+#         end
+#       end
+#     end
+#   end
 # end
