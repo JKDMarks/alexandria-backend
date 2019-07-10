@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get '/decks/:id', to: 'decks#show'
   post '/decks', to: 'decks#create'
   post '/decks/url', to: 'decks#create_from_url'
+  get '/decks/update_img/:id', to: 'decks#update_img'
   patch '/decks/:id', to: 'decks#update'
   delete '/decks/:id', to: 'decks#delete'
 

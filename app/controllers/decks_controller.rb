@@ -133,6 +133,11 @@ class DecksController < ApplicationController
   end
 
 
+  def update_img
+    @deck = Deck.find(params[:id])
+    update_deck_random_img(@deck)
+  end
+
 
   private
 

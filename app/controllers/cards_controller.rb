@@ -20,15 +20,18 @@ class CardsController < ApplicationController
 
   def update_image
     card_id = params[:cardId]
+    image = params[:imageURL]
     if card_id
       card = Card.find(card_id)
-      user = nil
     else
-      image = params[:imageURL]
       image = image[0..image.index("?")-1]
       user = User.find_by("image ~* ?", image)
       card = Card.find_by("image_uris ~* ?", image)
+      deck = Deck.find_by("image ~* ?", image)
     end
+
+    user = User.find_by("image ~* ?", image)
+    deck = Deck.find_by("image ~* ?", image)
 
     if card
       updated_card = JSON.parse(open("https://api.scryfall.com/cards/#{card.scryfall_id}").read)
@@ -37,6 +40,10 @@ class CardsController < ApplicationController
 
       if user
         user.update(image: card.image_uris["art_crop"])
+      end
+
+      if deck
+        deck.update(image: card.image_uris["art_crop"])
       end
     else
       if user
