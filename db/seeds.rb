@@ -64,15 +64,32 @@ archetypes = [
   ["Shops", "vintage"],
 ]
 
-archetypes.each do |archetype|
-  deck = Deck.create(
-    user: User.all.sample,
-    name: archetype[0],
-    format: archetype[1],
-    image: Card.all.sample.image_uris["art_crop"]
-  )
+# archetypes.each do |archetype|
+#   deck = Deck.create(
+#     user: User.all.sample,
+#     name: archetype[0],
+#     format: archetype[1],
+#     image: Card.all.sample.image_uris["art_crop"]
+#   )
+#
+#   5.times do
+#     DeckCard.create(deck: deck, card: Card.all.sample, quantity: rand(1..4))
+#   end
+# end
 
-  5.times do
-    DeckCard.create(deck: deck, card: Card.all.sample, quantity: rand(1..4))
-  end
-end
+# Deck.all.each do |deck|
+#   decklist = ["", "Sideboard"]
+#
+#   deck.deck_cards.each do |deck_card|
+#     card = Card.find(deck_card.card_id)
+#     if deck_card.sideboard
+#       decklist.push("#{deck_card.quantity} #{card.name}")
+#     else
+#       decklist.unshift("#{deck_card.quantity} #{card.name}")
+#     end
+#   end
+#
+#   decklist = decklist.join("\n")
+#
+#   deck.update(decklist: decklist)
+# end

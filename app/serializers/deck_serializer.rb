@@ -1,5 +1,5 @@
 class DeckSerializer < ActiveModel::Serializer
-  attributes :id, :user_id, :name, :image, :format, :created_at, :colors
+  attributes :id, :user_id, :name, :image, :format, :created_at, :colors, :decklist
 
   has_many :deck_cards
   has_many :cards
