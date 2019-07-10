@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   get '/decks/format/:format', to: 'decks#by_format'
   get '/decks/:id', to: 'decks#show'
   post '/decks', to: 'decks#create'
+  post '/decks/url', to: 'decks#create_from_url'
   patch '/decks/:id', to: 'decks#update'
   delete '/decks/:id', to: 'decks#delete'
 
