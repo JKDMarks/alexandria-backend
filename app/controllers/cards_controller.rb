@@ -21,6 +21,7 @@ class CardsController < ApplicationController
   def update_image
     card_id = params[:cardId]
     image = params[:imageURL]
+    deck_id = params[:deckId]
     if card_id
       card = Card.find(card_id)
     else
@@ -28,6 +29,10 @@ class CardsController < ApplicationController
       user = User.find_by("image ~* ?", image)
       card = Card.find_by("image_uris ~* ?", image)
       deck = Deck.find_by("image ~* ?", image)
+    end
+
+    if deck_id
+      update_deck_random_img(Deck.find(deck_id))
     end
 
     user = User.find_by("image ~* ?", image)

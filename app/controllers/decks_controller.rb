@@ -53,10 +53,15 @@ class DecksController < ApplicationController
   def create_from_url
     deck_url = params[:deckURL]
 
+    format_hash = {
+      "Commander / EDH" => "commander",
+      "Modern*" => "modern",
+    }
+
     if deck_url
       deck_page = Nokogiri::HTML(open(deck_url))
 
-      if deck_url.include?("www.mtggoldfish.com")
+      if deck_url.include?("mtggoldfish.com")
         ############### MTGGOLDFISH ###############
         name = deck_page.css("h2.deck-view-title")[0].children[0].text.strip
         format_string = deck_page.css("div.deck-view-description")[0].text.split("\n").find{|str| str.start_with?("Format:")}
@@ -69,18 +74,59 @@ class DecksController < ApplicationController
         split_index = deck_array.index{|str| str.start_with?("Sideboard")}
         mainboard = deck_array[0..(split_index - 1)]
         sideboard = deck_array[(split_index + 1)..-2]
-      elsif deck_url.include?("www.starcitygames.com")
+      elsif deck_url.include?("starcitygames.com")
         ############### STARCITYGAMES ###############
         name = deck_page.css("header.deck_title").text
         format = deck_page.css("div.deck_format").text.downcase
         card_uls = deck_page.css("div.cards_col1, div.cards_col2").css("ul")
         mainboard = card_uls[0..-2].css("li").map{|li| li.text}
         sideboard = card_uls.last.css("li").map{|li| li.text}
+      elsif deck_url.include?("tappedout.net")
+        ############### TAPPEDOUT ###############
+        card_h3s_lis = deck_page.css(".row.board-container")[0].css(".board-col").css("h3, li")
+        mainboard = []
+        sideboard = []
+        is_sideboard = false
+        card_h3s_lis.each do |node|
+          if node.name == "h3"
+            ########## h3 ##########
+            if node.text.starts_with?("Sideboard")
+              is_sideboard = true
+            elsif node.text.starts_with?("Commander")
+              link = node.parent.css("h3 + ul > a")[0].attributes["href"].value
+              card_name = link[link.index("-card/")+"-card/".length..-1]
+              card_name = card_name[0..card_name.index("-")-1]
+              card = Card.find_by("name ~* ?", card_name)
+              if card
+                sideboard.push("1 " + card.name)
+              end
+            end
+          else
+            ########## li ##########
+            quantity = node.css("a")[0].text.to_i.to_s
+            card_name = node.css("span").text.strip
+            if is_sideboard
+              sideboard.push(quantity + " " + card_name)
+            else
+              mainboard.push(quantity + " " + card_name)
+            end
+          end
+        end
+        name = deck_page.css(".featured-card-box ~ h2")[0].text.strip
+        format_string = deck_page.css(".featured-card-box ~ p")[0].text.strip
+        format_string = format_string[0..format_string.index("\n") - 1]
+        format_hash[format_string] ? format = format_hash[format_string] : format = format_string
+        if deck_page.css(".commander-img").any?
+          image_url = deck_page.css(".commander-img")[0].attributes["src"].value
+          image = image_url[image_url.index("//") + 2..-1]
+        end
       else
         render json: { error: "Unknown website" }
       end
 
-      @deck = Deck.create(name: name, format: format, user_id: params[:userId])
+      decklist = mainboard.join("\n") + "\n\n" + sideboard.join("\n")
+
+      @deck = Deck.create(name: name, format: format, user_id: params[:userId], decklist: decklist)
 
       deck_colors = []
 
@@ -93,6 +139,10 @@ class DecksController < ApplicationController
       deck_colors = deck_colors.uniq
 
       update_deck_random_img(@deck)
+
+      if !@deck.image
+        @deck.update(image: image)
+      end
 
       @deck.update(colors: deck_colors)
 
@@ -160,6 +210,7 @@ class DecksController < ApplicationController
 
         card_name = card_name.sub("’", "'")
 
+        # card_instance = Card.find_by_name(card_name)
         card_instance = Card.find_by("name ~* ?", "^" + card_name)
       else
         card_instance = nil
@@ -182,18 +233,5 @@ class DecksController < ApplicationController
     end
 
     return { deck_colors: deck_colors }
-  end
-
-  def update_deck_random_img(deck)
-    nonland_quantity_4_cards = deck.deck_cards.where(quantity: 4, sideboard: false).map{ |deck_card| deck_card.card }.select{ |card| card.types.exclude?("Land") }
-    random_card = nonland_quantity_4_cards.sample
-
-    if random_card.image_uris.any?
-      art_crop = random_card.image_uris["art_crop"]
-      if art_crop
-        deck.update(image: art_crop)
-      end
-    end
-
   end
 end
