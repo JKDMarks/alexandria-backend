@@ -1,26 +1,28 @@
-[Link to Frontend](https://github.com/Jeffrey-Marks/alexandria-frontend/)
+<img src="https://i.imgur.com/VdBlP49.png" alt="Alexandria logo">
 
-# README
+A website for uploading, managing, and organizing Magic: the Gathering decklists.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+**[Link to Frontend](https://github.com/Jeffrey-Marks/alexandria-frontend/)**
 
-Things you may want to cover:
+## Inspiration
 
-* Ruby version
+There are many MTG decklists websites online, but no one of them has all of the features that I desired. *Alexandria* was created as a way to integrate all of these features.
 
-* System dependencies
+## Features and Challenges
 
-* Configuration
+Database built using PostgreSQL.
 
-* Database creation
+Uses various **has_many through** domain model connections to relate Users, Decks, and Cards. 
 
-* Database initialization
+Has authentication using the BCrypt and JWT gems. 
 
-* How to run the test suite
+## Built With
 
-* Services (job queues, cache servers, search engines, etc.)
+* [Ruby on Rails](https://rubyonrails.org/) - Used as a RESTful API built on top of a SQL database
+* [PostgreSQL](https://www.postgresql.org/) - Database
+* [BCrypt](https://github.com/codahale/bcrypt-ruby) - Password hashing
+* [JWT](https://github.com/jwt/ruby-jwt) - JSON Web Token OAuth
 
-* Deployment instructions
+## Notes
 
-* ...
+Named after the [famous card](https://scryfall.com/card/arn/76/library-of-alexandria) and the (more) famous library. In Magic your deck is called a library.
