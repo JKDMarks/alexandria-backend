@@ -22,6 +22,7 @@ Has authentication using the BCrypt and JWT gems.
 * [PostgreSQL](https://www.postgresql.org/) - Database
 * [BCrypt](https://github.com/codahale/bcrypt-ruby) - Password hashing
 * [JWT](https://github.com/jwt/ruby-jwt) - JSON Web Token OAuth
+* [ActiveModel Serializer](https://github.com/rails-api/active_model_serializers) - Gem that shapes return data
 
 ## Notes
 
