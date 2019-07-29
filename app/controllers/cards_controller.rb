@@ -41,7 +41,11 @@ class CardsController < ApplicationController
     if card
       updated_card = JSON.parse(open("https://api.scryfall.com/cards/#{card.scryfall_id}").read)
 
-      card.update(image_uris: updated_card["image_uris"])
+      if updated_card["card_faces"]
+        card.update(image_uris: updated_card["card_faces"][0]["image_uris"])
+      else
+        card.update(image_uris: updated_card["image_uris"])
+      end
 
       if user
         user.update(image: card.image_uris["art_crop"])
