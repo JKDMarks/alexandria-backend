@@ -89,7 +89,7 @@ archetypes = [
 #       decklist.unshift("#{deck_card.quantity} #{card.name}")
 #     end
 #   end
-# 
+
 #   decklist = decklist.join("\n")
 #
 #   deck.update(decklist: decklist)

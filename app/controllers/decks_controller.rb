@@ -211,7 +211,7 @@ class DecksController < ApplicationController
         card_name = card_name.sub("’", "'")
 
         # card_instance = Card.find_by_name(card_name)
-        card_instance = Card.find_by("name ~* ?", "^" + card_name)
+        card_instance = Card.find_by("name ~* ?", "^" + card_name + "$")
       else
         card_instance = nil
       end
