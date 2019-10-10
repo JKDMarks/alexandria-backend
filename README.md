@@ -2,7 +2,7 @@
 
 A website for uploading, managing, and organizing Magic: the Gathering decklists.
 
-**[Link to Frontend](https://github.com/Jeffrey-Marks/alexandria-frontend/)**
+**[Link to Frontend](https://github.com/JKDMarks/alexandria-frontend/)**
 
 ## Inspiration
 
